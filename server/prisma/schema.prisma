@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+
+  tickets   Ticket[]
+  payments  Payment[]
+}
+
+
+model Ticket {
+  id        Int      @id @default(autoincrement())
+  title     String
+  status    String   @default("open")
+  priority  String   @default("normal")
+  userId    Int
+  createdAt DateTime @default(now())
+
+  user      User @relation(fields: [userId], references: [id])
+  messages  Message[]
+}
+
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  text      String
+  sender    String
+  ticketId Int
+  createdAt DateTime @default(now())
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+}
+
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  amount    Int
+  status    String
+  authority String?
+  userId    Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+
+model GangPackage {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Int
+  features    String
+  createdAt   DateTime @default(now())
+}
+
+
+model Staff {
+  id        Int      @id @default(autoincrement())
+  name      String
+  position  String
+  avatar    String?
+  createdAt DateTime @default(now())
+}
+
+
+model News {
+  id        Int @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+
+model Rule {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  category  String   @default("RP")
+}
+
+
+model Setting {
+  id        Int @id @default(autoincrement())
+  key       String @unique
+  value     String
+}
+
+
+model Log {
+  id        Int @id @default(autoincrement())
+  action    String
+  createdAt DateTime @default(now())
+}

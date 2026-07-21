@@ -6,7 +6,7 @@ const prisma = require("../prisma/client");
 exports.register = async (req, res) => {
     try {
 
-        const { username, email, password } = req.body;
+        let { username, email, password } = req.body;
 
 
         if (!username || !email || !password) {
@@ -16,28 +16,57 @@ exports.register = async (req, res) => {
         }
 
 
-        if (password.length < 6) {
+        email = email.toLowerCase().trim();
+        username = username.trim();
+
+
+        if (username.length < 3) {
             return res.status(400).json({
-                message: "Password must be at least 6 characters"
+                message: "Username too short"
             });
         }
 
 
-        const exists = await prisma.user.findUnique({
+        if (password.length < 8) {
+            return res.status(400).json({
+                message: "Password must be minimum 8 characters"
+            });
+        }
+
+
+        const emailRegex =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                message: "Invalid email"
+            });
+        }
+
+
+        const exists = await prisma.user.findFirst({
             where: {
-                email
+                OR: [
+                    { email },
+                    { username }
+                ]
             }
         });
 
 
         if (exists) {
-            return res.status(400).json({
-                message: "Email already exists"
+            return res.status(409).json({
+                message: "User already exists"
             });
         }
 
 
-        const hash = await bcrypt.hash(password, 12);
+
+        const hash = await bcrypt.hash(
+            password,
+            12
+        );
 
 
         const user = await prisma.user.create({
@@ -50,13 +79,17 @@ exports.register = async (req, res) => {
 
 
         res.status(201).json({
+
             message: "Account created",
+
             user: {
                 id: user.id,
                 username: user.username,
                 email: user.email
             }
+
         });
+
 
 
     } catch (error) {

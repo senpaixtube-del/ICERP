@@ -46,6 +46,8 @@ const SnowflakeIcon = ({ size = 20, className = "" }) => (
 );
 
 const API_BASE_URL = "https://icerp.up.railway.app/api";
+const SERVER_IP = "217.18.90.211";
+const SERVER_PORT = "30120";
 
 export default function DashboardPage() {
     const [user, setUser] = useState(null);
@@ -93,6 +95,12 @@ export default function DashboardPage() {
         return localStorage.getItem("token");
     };
 
+    // ===== CONNECT TO SERVER =====
+    const connectToServer = () => {
+        const connectUrl = `fivem://connect/${SERVER_IP}:${SERVER_PORT}`;
+        window.open(connectUrl, "_blank");
+    };
+
     // ===== LOAD DATA FROM API =====
     useEffect(() => {
         async function loadData() {
@@ -131,7 +139,6 @@ export default function DashboardPage() {
                         });
                     } else {
                         console.error("Failed to fetch stats:", statsRes.status);
-                        // مقدار پیش‌فرض
                         setStats({
                             playersOnline: 0,
                             maxPlayers: 1024,
@@ -327,7 +334,10 @@ export default function DashboardPage() {
                             <span className="text-sm text-white">Transactions</span>
                             <ChevronRight size={14} className="text-gray-400" />
                         </div>
-                        <button className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-2 rounded-xl font-bold text-white hover:shadow-[0_0_30px_rgba(34,211,238,.4)] transition">
+                        <button
+                            onClick={connectToServer}
+                            className="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-2 rounded-xl font-bold text-white hover:shadow-[0_0_30px_rgba(34,211,238,.4)] transition"
+                        >
                             Connect to Server
                         </button>
                     </div>

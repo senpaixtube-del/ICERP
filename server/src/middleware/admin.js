@@ -1,24 +1,21 @@
-module.exports = function (...roles) {
+const express = require("express");
+const router = express.Router();
 
-    return (req, res, next) => {
-
-
-        if (!req.user) {
-            return res.status(401).json({
-                message: "Unauthorized"
-            });
-        }
+const authMiddleware = require("../middleware/authMiddleware");
 
 
-        if (!roles.includes(req.user.role)) {
-            return res.status(403).json({
-                message: "Access denied"
-            });
-        }
+router.get(
+    "/profile",
+    authMiddleware,
+    (req, res) => {
 
-
-        next();
+        res.json({
+            message: "Protected route",
+            user: req.user
+        });
 
     }
+);
 
-}
+
+module.exports = router;

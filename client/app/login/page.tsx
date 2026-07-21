@@ -1,35 +1,106 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Lock, Mail, Crown, ArrowRight } from "lucide-react";
 
 export default function Login() {
 
+    const router = useRouter();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
+
+
+
+    // ICE CARD MOUSE LIGHT
+    const cardRef = useRef<HTMLDivElement>(null);
+
+
+
+    const handleMouseMove = (
+        e: React.MouseEvent<HTMLDivElement>
+    ) => {
+
+
+        const rect = cardRef.current?.getBoundingClientRect();
+
+
+        if (!rect) return;
+
+
+        const x = e.clientX - rect.left;
+
+        const y = e.clientY - rect.top;
+
+
+        cardRef.current?.style.setProperty(
+            "--x",
+            `${x}px`
+        );
+
+
+        cardRef.current?.style.setProperty(
+            "--y",
+            `${y}px`
+        );
+
+
+    };
+
+    // SHAKE CARD ON ERROR
+    const shakeCard = () => {
+
+        cardRef.current?.classList.add("shake");
+
+        setTimeout(() => {
+
+            cardRef.current?.classList.remove("shake");
+
+        }, 500);
+
+    };
+
 
     async function handleLogin() {
 
+        setLoading(true);
+        setMessage("");
+
         try {
+
 
             const res = await fetch(
                 "https://icerp.up.railway.app/api/auth/login",
                 {
+
                     method: "POST",
+
+                    credentials: "include",
+
                     headers: {
                         "Content-Type": "application/json"
                     },
+
                     body: JSON.stringify({
-                        email,
+                        email: email.toLowerCase().trim(),
                         password
                     })
+
                 }
             );
 
 
+
             const data = await res.json();
-            console.log(data);
+
+
 
             if (data.token) {
+
 
                 localStorage.setItem(
                     "token",
@@ -43,70 +114,355 @@ export default function Login() {
                 );
 
 
-                alert("Welcome to ICERP 👑");
+                setMessage(
+                    "Welcome to ICERP 👑"
+                );
 
 
-                window.location.href = "/";
+
+                setTimeout(() => {
+
+                    router.push("/dashboard");
+
+                }, 800);
+
 
             }
             else {
 
-                alert(data.message || "Login failed");
+
+                setMessage(
+                    data.message || "Login failed"
+                );
+
+                shakeCard();
+
 
             }
 
 
-        } catch (error) {
+
+        }
+        catch (error) {
+
 
             console.log(error);
 
-            alert("Server connection error");
+
+            setMessage(
+                "Server connection error"
+            );
+
+            shakeCard();
+
 
         }
+
+
+        setLoading(false);
+
 
     }
 
 
+
+
+
+
     return (
-        <main className="min-h-screen bg-[#05070D] text-white flex items-center justify-center">
+
+        <main className="
+        min-h-screen
+        flex
+        items-center
+        justify-center
+        px-6
+        text-white
+        relative
+        overflow-hidden
+        ">
 
 
-            <div className="bg-[#0D1117] p-8 rounded-2xl border border-cyan-500/20 w-[400px]">
 
 
-                <h1 className="text-3xl text-cyan-400 font-bold mb-6 text-center">
-                    ❄️ ICERP Login
-                </h1>
+            {/* BACKGROUND */}
+
+            <div
+
+                className="
+                absolute
+                inset-0
+                bg-cover
+                bg-center
+                bg-no-repeat
+                "
+
+                style={{
+                    backgroundImage:
+                        "url('/snowlogin.png')"
+                }}
+
+            />
 
 
-                <input
-                    className="w-full p-3 mb-4 bg-black rounded"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
 
 
-                <input
-                    className="w-full p-3 mb-6 bg-black rounded"
-                    placeholder="Password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+
+            {/* OVERLAY */}
+
+            <div className="overlay-blur" />
 
 
-                <button
-                    onClick={handleLogin}
-                    className="w-full bg-cyan-400 text-black p-3 rounded-xl font-bold hover:bg-cyan-300"
+
+
+
+
+
+            {/* LOGIN CARD */}
+
+            <div
+
+                ref={cardRef}
+
+                onMouseMove={handleMouseMove}
+
+                className="
+                relative
+                z-10
+                ice-cover
+                login-show
+                "
+
+            >
+
+
+                {/* LOGO */}
+
+                <div
+                    className="
+                    login-logo
+                    flex
+                    justify-center
+                    mb-6
+                    "
                 >
-                    Login
-                </button>
+
+                    <div
+                        className="
+                        p-5
+                        rounded-full
+                        bg-cyan-400/10
+                        border
+                        border-cyan-300/30
+                        "
+                    >
+
+                        <Crown
+                            size={55}
+                            className="
+                            text-cyan-300
+                            drop-shadow-[0_0_20px_#22d3ee]
+                            "
+                        />
+
+                    </div>
+
+                </div>
+
+
+
+                <div className="ice-content">
+
+
+                    <h1 className="
+                        text-4xl
+                        font-black
+                        text-center
+                        ">
+
+                        ICERP Login ❄️
+
+                    </h1>
+
+
+
+                    <p className="
+                        text-center
+                        text-cyan-100/70
+                        mt-3
+                        mb-8
+                        ">
+
+                        Welcome back to the system
+
+                    </p>
+
+
+
+
+
+                    <div className="
+                        flex
+                        items-center
+                        gap-3
+                        border
+                        border-white/10
+                        rounded-xl
+                        px-4
+                        mb-5
+                        bg-black/20
+                        ">
+
+
+                        <Mail className="text-cyan-300" />
+
+
+                        <input
+
+                            className="
+                                ice-input
+                                !bg-transparent
+                                !border-0
+                                !mb-0
+                                !h-14
+                                "
+
+                            placeholder="Email"
+
+                            value={email}
+
+                            onChange={
+                                e => setEmail(e.target.value)
+                            }
+
+                        />
+
+
+                    </div>
+
+
+
+
+
+                    <div className="
+                        flex
+                        items-center
+                        gap-3
+                        bg-black/30
+                        border
+                        border-white/10
+                        rounded-xl
+                        px-4
+                        ">
+
+
+                        <Lock className="text-cyan-300" />
+
+
+                        <input
+
+                            className="
+                                ice-input
+                                !bg-transparent
+                                !border-0
+                                !mb-0
+                                !h-14
+                                "
+
+                            placeholder="Password"
+
+                            type="password"
+
+                            value={password}
+
+                            onChange={
+                                e => setPassword(e.target.value)
+                            }
+
+                        />
+
+
+                    </div>
+
+
+
+
+
+                    <button
+
+                        onClick={handleLogin}
+
+                        disabled={loading}
+
+                        className="ice-button mt-8"
+
+                    >
+
+                        {
+                            loading
+                                ?
+                                <div className="loader"></div>
+                                :
+                                <>
+                                    LOGIN
+                                    <ArrowRight className="inline ml-2" />
+                                </>
+                        }
+
+
+                    </button>
+
+
+
+
+                    {
+                        message &&
+
+                        <p className="ice-message mt-5">
+
+                            {message}
+
+                        </p>
+
+                    }
+
+
+
+                    <p className="
+                        text-center
+                        mt-6
+                        text-gray-300
+                        ">
+
+                        No account?
+
+
+                        <Link
+                            href="/register"
+                            className="
+                                ml-2
+                                text-cyan-300
+                                "
+                        >
+
+                            Register
+
+                        </Link>
+
+
+                    </p>
+
+
+
+                </div>
 
 
             </div>
 
 
-        </main>
+
+        </main >
+
     );
+
 }

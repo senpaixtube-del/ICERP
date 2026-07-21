@@ -448,9 +448,9 @@ export default function DashboardPage() {
                             leadersData.map((player) => (
                                 <div key={player.rank} className="flex items-center gap-3">
                                     <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${player.rank === 1 ? 'bg-yellow-500/30 text-yellow-400' :
-                                            player.rank === 2 ? 'bg-gray-400/30 text-gray-300' :
-                                                player.rank === 3 ? 'bg-orange-500/30 text-orange-400' :
-                                                    'bg-white/10 text-gray-400'
+                                        player.rank === 2 ? 'bg-gray-400/30 text-gray-300' :
+                                            player.rank === 3 ? 'bg-orange-500/30 text-orange-400' :
+                                                'bg-white/10 text-gray-400'
                                         }`}>
                                         {player.rank}
                                     </span>

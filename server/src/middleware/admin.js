@@ -1,21 +1,38 @@
-const express = require("express");
-const router = express.Router();
+module.exports = (...roles) => {
 
-const authMiddleware = require("../middleware/authMiddleware");
+    return (req, res, next) => {
 
+        try {
 
-router.get(
-    "/profile",
-    authMiddleware,
-    (req, res) => {
+            if (!req.user) {
 
-        res.json({
-            message: "Protected route",
-            user: req.user
-        });
+                return res.status(401).json({
+                    message: "Unauthorized"
+                });
 
-    }
-);
+            }
 
 
-module.exports = router;
+            if (!roles.includes(req.user.role)) {
+
+                return res.status(403).json({
+                    message: "Access denied"
+                });
+
+            }
+
+
+            next();
+
+
+        } catch (error) {
+
+            return res.status(500).json({
+                message: "Permission check failed"
+            });
+
+        }
+
+    };
+
+};
